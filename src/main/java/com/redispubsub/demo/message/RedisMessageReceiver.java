@@ -9,8 +9,8 @@ import com.alibaba.fastjson.JSON;
 import javax.annotation.Resource;
 
 /**
- * @author yearns
- * @date 2019/7/11 13:23
+ * 实现消息的接收功能
+ * @author liuhongdi
  */
 @Component
 public class RedisMessageReceiver {
@@ -29,17 +29,24 @@ public class RedisMessageReceiver {
         System.out.println(channel+":消息来了："+msg.getMsgType()+";content:"+msg.getContent());
 
         if (channel.equals(Constants.CHANNEL_GOODS)) {
-            String goodslist = msg.getContent();
-            String[] strArr = goodslist.split(",");
-            System.out.println(strArr);
-            for (int i = 0; i < strArr.length; ++i){
-                Long goodsId = Long.parseLong(strArr[i]);
-                if (msg.getMsgType().equals("update")) {
-                    localCacheService.updateGoodsCache(goodsId);
-                } else if (msg.getMsgType().equals("delete")) {
-                    localCacheService.deleteGoodsCache(goodsId);
+
+            if (msg.getMsgType().equals("deleteall")) {
+                localCacheService.deleteGoodsCacheAll();
+            } else if (msg.getMsgType().equals("delete") || msg.getMsgType().equals("update")) {
+                String goodslist = msg.getContent();
+                String[] strArr = goodslist.split(",");
+                System.out.println(strArr);
+
+                for (int i = 0; i < strArr.length; ++i){
+                    Long goodsId = Long.parseLong(strArr[i]);
+                    if (msg.getMsgType().equals("update")) {
+                        localCacheService.updateGoodsCache(goodsId);
+                    } else if (msg.getMsgType().equals("delete")) {
+                        localCacheService.deleteGoodsCache(goodsId);
+                    }
                 }
             }
+
         }
     }
 }

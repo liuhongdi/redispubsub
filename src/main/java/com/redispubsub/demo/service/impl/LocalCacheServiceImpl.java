@@ -15,6 +15,7 @@ public class LocalCacheServiceImpl implements LocalCacheService {
     @Resource
     private RedisTemplate redis1Template;
 
+    //更新缓存
     @CachePut(value = "goods", key="#goodsId")
     @Override
     public Goods updateGoodsCache(Long goodsId){
@@ -23,9 +24,17 @@ public class LocalCacheServiceImpl implements LocalCacheService {
         return goodsr;
     }
 
+    //删除缓存
     @CacheEvict(value = "goods" ,key = "#goodsId")
     @Override
     public void deleteGoodsCache(Long goodsId) {
         System.out.println("删除缓存 ");
+    }
+
+    //清除缓存
+    @CacheEvict(value = "goods", allEntries=true)
+    @Override
+    public void deleteGoodsCacheAll() {
+        System.out.println("已删除全部缓存 ");
     }
 }

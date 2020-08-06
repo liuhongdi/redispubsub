@@ -26,7 +26,7 @@ public class CacheConfig {
 
     //定义cache名称、超时时长（秒）、最大容量
     public enum CacheEnum{
-        goods(60,1000),       //有效期600秒, 最大容量1000
+        goods(600,1000),       //有效期600秒, 最大容量1000
         homePage(7200,1000),  //有效期2个小时 , 最大容量1000
         ;
         CacheEnum(int ttl, int maxSize) {

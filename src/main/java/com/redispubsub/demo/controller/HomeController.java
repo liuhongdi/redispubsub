@@ -18,24 +18,29 @@ import java.util.concurrent.ConcurrentMap;
 @RestController
 @RequestMapping("/home")
 public class HomeController {
-
-    //@Resource
-    //private StringRedisTemplate stringRedisTemplate;
-
     @Resource
     private RedisTemplate redis1Template;
-
     @Resource
     private GoodsService goodsService;
-
     @Resource
     private CacheManager getCacheManager;
 
+    //发清空缓存的消息
+    @GetMapping("/deleteall")
+    public String deleteall(){
+        String ret = "清除缓存的消息已发出";
+        //删除id为4的商品的缓存
+        Msg msg_del = new Msg();
+        msg_del.setMsgType("deleteall");
+        msg_del.setContent("");
+        redis1Template.convertAndSend("goodsCache",JSON.toJSONString(msg_del));
+        return ret;
+    }
+
+    //发更新缓存和删除缓存的消息
     @GetMapping("/update")
     public String update(){
-
            String ret = "";
-
            int goodsId = 3;
             //更新redis
            System.out.println("get data from redis");
@@ -44,9 +49,7 @@ public class HomeController {
            ret = "更新前:<br/>"+goodsr.toString()+"<br/>";
            String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss").format(System.currentTimeMillis());
            goodsr.setGoodsName("更新后的商品名，更新时间:"+now);
-
            redis1Template.opsForValue().set(key,goodsr);
-
            Goods goodsr2 = (Goods)redis1Template.opsForValue().get(key);
            ret += "更新后:<br/>"+goodsr2.toString()+"<br/>";
 
@@ -61,7 +64,6 @@ public class HomeController {
             msg_del.setMsgType("delete");
             msg_del.setContent("4");
         redis1Template.convertAndSend("goodsCache",JSON.toJSONString(msg_del));
-
         return ret;
     }
 
@@ -79,7 +81,6 @@ public class HomeController {
     @GetMapping("/stats")
     @ResponseBody
     public Object stats() {
-
         CaffeineCache caffeine = (CaffeineCache)getCacheManager.getCache("goods");
         Cache goods = caffeine.getNativeCache();
         String statsInfo="cache名字:goods<br/>";
@@ -91,9 +92,6 @@ public class HomeController {
             statsInfo += "key:"+key.toString()+";value:"+map.get(key)+"<br/>";
         }
         statsInfo += "统计信息:"+goods.stats().toString();
-
         return statsInfo;
     }
-
-
 }
